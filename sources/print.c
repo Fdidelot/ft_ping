@@ -1,13 +1,21 @@
 #include "ft_ping.h"
 
+void	print_verbose_info(t_ping_data p_data)
+{
+	printf("ft_ping: sock4.fd: %d (socktype: SOCK_RAW), sock6.fd: -1 (socktype: 0), hints.ai_family: AF_INET\n\n", 
+				p_data.sockfd);
+}
+
+void	print_usage_error(void)
+{
+	fprintf(stderr, "ft_ping: usage error: Destination address required\n");
+	exit(EXIT_FAILURE);
+}
+
 void	print_start_info(t_ping_data p_data)
 {
 	if (p_data.options & V_OPT)
-	{
-		printf("ft_ping: sock4.fd: %d (socktype: SOCK_RAW), sock6.fd: -1 (socktype: 0), hints.ai_family: AF_INET\n\n", 
-					p_data.sockfd);
 		printf("ai->ai_family: AF_INET, ai->canonname: '%s'\n", p_data.canonname);
-	}
 	printf("PING %s (%s) %d(%d) bytes of data.\n", p_data.arg, p_data.ip_address, 
 													DEFAULT_PAYLOAD_SIZE, TOTAL_PACKET_SIZE);
 }

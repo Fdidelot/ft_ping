@@ -39,8 +39,8 @@ typedef struct	s_ping_data
 	char				*arg;
 	char				ip_address[INET_ADDRSTRLEN];
 	char				fqdn[NI_MAXHOST];
-	char				response[PACKET_SIZE];
 	char				canonname[MAX_SIZE_NAME];
+	char				response[PACKET_SIZE];
 	struct sockaddr_in	addr;
 	int					sockfd;
 	unsigned int		sequence;
@@ -73,5 +73,7 @@ void	print_end_stats(t_ping_data p_data);
 double	time_diff(struct timespec start_time, struct timespec end_time);
 void	print_helper(void);
 void	print_start_info(t_ping_data p_data);
+void	print_usage_error(void);
+void	print_verbose_info(t_ping_data p_data);
 
 #endif

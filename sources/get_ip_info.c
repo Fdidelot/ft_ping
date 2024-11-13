@@ -9,18 +9,19 @@ void	dns_lookup(t_ping_data *p_data, char *ip)
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_flags = AI_CANONNAME;
-	if ((status = getaddrinfo(ip, NULL, &hints, &res)) != 0)
+	status = getaddrinfo(ip, NULL, &hints, &res);
+	if (status != 0)
 	{
-		fprintf(stderr, "ping: %s: %s\n", ip, gai_strerror(status));
+		fprintf(stderr, "ft_ping: %s: %s\n", ip, gai_strerror(status));
 		close(p_data->sockfd);
 		exit(EXIT_FAILURE);
 	}
+	ipv4 = (struct sockaddr_in *)res->ai_addr;
 	if (res->ai_canonname != NULL)
 	{
 		if (strlen(res->ai_canonname) < MAX_SIZE_NAME)
 			strcpy(p_data->canonname, res->ai_canonname);
 	}
-	ipv4 = (struct sockaddr_in *)res->ai_addr;
 	if (inet_ntop(AF_INET, &ipv4->sin_addr, p_data->ip_address, INET_ADDRSTRLEN) == NULL)
 	{
 		perror("inet_ntop");
