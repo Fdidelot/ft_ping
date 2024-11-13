@@ -5,10 +5,13 @@ PATH_SRC	=	./sources/
 PATH_HEAD	= ./headers/
 
 SRCS	=	main.c \
-			get_ip_info.c \
 			set_struct_and_package.c \
-			handle_signal.c \
-			time.c
+			get_ip_info.c \
+			parser.c \
+			send_ping.c \
+			time.c \
+			print.c \
+			handle_signal.c
 vpath %.c $(PATH_SRC)
 
 HEADERS = ft_ping.h

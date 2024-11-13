@@ -1,38 +1,63 @@
-#include "ft_ping.h"
+#include <ft_ping.h>
 
-extern int total_packet_size;
-extern t_ping_data ping_data;
-
-void setup_ip_address(char *hostname)
+void	dns_lookup(t_ping_data *p_data, char *ip)
 {
-	struct addrinfo 	hints, *res;
-	int 				status;
+	struct addrinfo		hints, *res;
+	int					status;
 	struct sockaddr_in	*ipv4;
 
 	memset(&hints, 0, sizeof(hints));
-	// Get IP address from DNS (dns_lookup)
 	hints.ai_family = AF_INET;
-	if ((status = getaddrinfo(hostname, NULL, &hints, &res)) != 0)
+	hints.ai_flags = AI_CANONNAME;
+	if ((status = getaddrinfo(ip, NULL, &hints, &res)) != 0)
 	{
-		fprintf(stderr, "ping: %s: %s\n", hostname, gai_strerror(status));
+		fprintf(stderr, "ping: %s: %s\n", ip, gai_strerror(status));
+		close(p_data->sockfd);
 		exit(EXIT_FAILURE);
 	}
-	ipv4 = (struct sockaddr_in *)res->ai_addr;
-	inet_ntop(AF_INET, &ipv4->sin_addr, ping_data.ip_address, INET_ADDRSTRLEN);
-	freeaddrinfo(res);
-	
-	status = inet_pton(ping_data.addr.sin_family, ping_data.ip_address, &ping_data.addr.sin_addr);
-	printf("status inet_pton = %d\n", status);
-	if (ping_data.addr.sin_addr.s_addr != INADDR_ANY)
+	if (res->ai_canonname != NULL)
 	{
-		// Get FQDN (Fully qualified domain name) from IP address (reverse_lookup)
-		getnameinfo((struct sockaddr *)&ping_data.addr, sizeof(ping_data.addr),
-						ping_data.fqdn, NI_MAXHOST, NULL, 0, NI_NAMEREQD);
+		if (strlen(res->ai_canonname) < MAX_SIZE_NAME)
+			strcpy(p_data->canonname, res->ai_canonname);
+	}
+	ipv4 = (struct sockaddr_in *)res->ai_addr;
+	if (inet_ntop(AF_INET, &ipv4->sin_addr, p_data->ip_address, INET_ADDRSTRLEN) == NULL)
+	{
+		perror("inet_ntop");
+		close(p_data->sockfd);
+		exit(EXIT_FAILURE);
+	}
+	freeaddrinfo(res);
+}
+
+void	reverse_dns_lookup(t_ping_data *p_data)
+{
+	int status;
+
+	status = inet_pton(p_data->addr.sin_family, p_data->ip_address, &p_data->addr.sin_addr);
+	if (status == -1)
+	{
+		perror("inet_pton");
+		close(p_data->sockfd);
+		exit(EXIT_FAILURE);
+	}
+	if (p_data->addr.sin_addr.s_addr == INADDR_ANY)
+	{
+		strcpy(p_data->fqdn, LOOPBACK_ADDRESS);
+		strcpy(p_data->ip_address, LOOPBACK_ADDRESS);
+		p_data->direct_ip = true;
 	}
 	else
 	{
-		strcpy(ping_data.fqdn, LOOPBACK_ADDRESS);
-		strcpy(ping_data.ip_address, LOOPBACK_ADDRESS);
-		ping_data.only_addr = true;
+		getnameinfo((struct sockaddr *)&p_data->addr, sizeof(p_data->addr),
+						p_data->fqdn, NI_MAXHOST, NULL, 0, NI_NAMEREQD);
 	}
+}
+
+void	get_ip_info(t_ping_data *p_data, char *ip)
+{
+	dns_lookup(p_data, ip);
+	reverse_dns_lookup(p_data);
+	if (strcmp(p_data->arg, p_data->ip_address) == 0)
+		p_data->direct_ip = true;
 }
