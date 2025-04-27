@@ -15,8 +15,8 @@ int main(int argc, char **argv)
 		exit(EXIT_SUCCESS);
 	}
 	set_p_data(&p_data);
-	if (p_data.options & V_OPT)
-		print_verbose_info(p_data);
+	// if (p_data.options & V_OPT)
+	// 	print_verbose_info(p_data);
 	get_ip_info(&p_data, p_data.arg);
 	if (p_data.arg == NULL)
 	{

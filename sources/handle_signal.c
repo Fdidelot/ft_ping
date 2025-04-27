@@ -7,7 +7,7 @@ void	sigint_handler(int sig)
 	if (sig == SIGINT)
 	{
 		calculate_time_stats(&p_data);
-	    printf("\n--- %s ft_ping statistics ---\n", p_data.arg);
+	    printf("--- %s ft_ping statistics ---\n", p_data.arg);
 		print_end_stats(p_data);
 	}
 	close(p_data.sockfd);

@@ -31,7 +31,6 @@ void	set_icmp_package(struct icmphdr *icmp_package, unsigned int sequence)
 void	set_p_data(t_ping_data *p_data)
 {
 	p_data->pid = getpid();
-	p_data->sequence = 1;
 	p_data->rtt_min = 1e9;
 	p_data->direct_ip = false;
 	p_data->sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
